@@ -1,0 +1,247 @@
+ COALESCE (birle?mek) ise bir fonksiyondur ve içerisindeki parameterelerden NULL olmayan
+    ilk ifadeyi döndürür. E?er ald??? tüm ifadeler NULL ise NULL döndürürür.
+   *** select COALESCE (sütun1,sütun2,...) from tabloAd?;
+    Birden fazla null ko?uluna göre de?er atamak istiyorsak COALESCE deyimini kullanabiliriz.
+    COALESCE asl?nda case mant???nda çal???r ve birden fazla kolon aras?nda kontrol sa?layabilirsiniz.
+    Bir ko?ul gerçekle?mez ise di?erine bakar, oda gerçekle?mez ise bir sonraki.
+    Deyim bitene kadar
+   -- CASE
+   WHEN (expression1 IS NOT NULL) THEN expression1
+   WHEN (expression2 IS NOT NULL) THEN expression2
+   ...
+   ELSE expressionN
+   END  --gibi
+   CREATE TABLE mart_satislar
+    (
+        urun_id number(10),
+        musteri_isim varchar2(50),
+        urun_isim varchar2(50)
+    );
+    CREATE TABLE nisan_satislar
+    (
+        urun_id number(10),
+        musteri_isim varchar2(50),
+        urun_isim varchar2(50)
+    );
+    INSERT INTO mart_satislar VALUES (10, 'Mark', 'Honda');
+    INSERT INTO mart_satislar VALUES (10, 'Mark', 'Honda');
+    INSERT INTO mart_satislar VALUES (20, 'John', 'Toyota');
+    INSERT INTO mart_satislar VALUES (30, 'Amy', 'Ford');
+    INSERT INTO mart_satislar VALUES (20, 'Mark', 'Toyota');
+    INSERT INTO mart_satislar VALUES (10, 'Adem', 'Honda');
+    INSERT INTO mart_satislar VALUES (40, 'John', 'Hyundai');
+    INSERT INTO mart_satislar VALUES (20, 'Eddie', 'Toyota');
+    
+    
+    INSERT INTO nisan_satislar VALUES (10, 'Hasan', 'Honda');
+    INSERT INTO nisan_satislar VALUES (10, 'Kemal', 'Honda');
+    INSERT INTO nisan_satislar VALUES (20, 'Ayse', 'Toyota');
+    INSERT INTO nisan_satislar VALUES (50, 'Yasar', 'Volvo');
+    INSERT INTO nisan_satislar VALUES (20, 'Mine', 'Toyota');
+    
+    select * from mart_satislar;
+    select * from nisan_satislar;
+    
+  --ORNEK1: MART VE N?SAN aylar?nda ayn? URUN_ID ile sat?lan ürünlerin
+  --URUN_ID’lerini listeleyen ve ayn? zamanda bu ürünleri MART ay?nda alan
+  --MUSTERI_ISIM 'lerini listeleyen bir sorgu yaz?n?z.
+    
+     select urun_id,musteri_isim from mart_satislar
+     where EXISTS(select urun_id from nisan_satislar
+                      where mart_satislar.urun_id=nisan_satislar.urun_id);
+                      
+                      
+     --select urun_id,musteri_isim from mart_satislar
+     --where urun_id IN(select urun_id from nisan_satislar
+       --               where mart_satislar.urun_id=nisan_satislar.urun_id);  
+       
+       
+       --ORNEK2: Her iki ayda da sat?lan ürünlerin URUN_ISIM'lerini ve bu ürünleri
+       --N?SAN ay?nda sat?n alan MUSTERI_ISIM'lerini listeleyen bir sorgu yaz?n?z.
+       
+       select urun_isim,musteri_isim from nisan_satislar n
+       where EXISTS(select urun_isim from mart_satislar  m
+                    where m.urun_isim=n.urun_isim);
+                    
+    --ORNEK3: Her iki ayda da ortak olarak sat?lmayan ürünlerin URUN_ISIM'lerini
+    --ve bu ürünleri N?SAN ay?nda sat?n alan MUSTERI_ISIM'lerini listeleyiniz.                
+       
+   select urun_isim,musteri_isim from nisan_satislar n
+   where NOT EXISTS(select urun_isim from mart_satislar m
+                where m.urun_isim=n.urun_isim);
+                
+                
+/*             ===================== IS NULL, IS NOT NULL, COALESCE(kulesk=birle?mek) ========================
+    IS NULL, ve IS NOT NULL BOOLEAN operatörleridir. Bir ifadenin NULL olup
+    olmad???n? kontrol ederler.
+==============================================================================*/
+    CREATE TABLE insanlar
+    (
+        ssn CHAR(9),
+        isim VARCHAR2(50),
+        adres VARCHAR2(50)
+    );
+    INSERT INTO insanlar VALUES('123456789', 'Ali Can', 'Istanbul');
+    INSERT INTO insanlar VALUES('234567890', 'Veli Cem', 'Ankara');
+    INSERT INTO insanlar VALUES('345678901', 'Mine Bulut', 'Izmir');
+    INSERT INTO insanlar (ssn, adres) VALUES('456789012', 'Bursa');
+    INSERT INTO insanlar (ssn, adres) VALUES('567890123', 'Denizli');
+    INSERT INTO insanlar (adres) VALUES('Sakarya');
+    INSERT INTO insanlar (ssn) VALUES('999111222');
+    
+    select * from insanlar;
+    
+    drop table insanlar;
+   
+       
+       --ORN2: ISIM'I NULL OLANLARI SORGULAYINIZ.
+       select * from insanlar
+       where isim is null;
+       
+     --ORN2: ISIM'I NULL OLMAYANLARI SORGULAYINIZ.  
+       select * from insanlar
+       where isim is not null;
+       
+       ORNEK3: isim 'i NULL olan ki?ilerin isim'ine NO NAME atay?n?z.
+       
+       update insanlar
+       set isim='no name'
+       where isim is null;    
+       
+       
+       
+    select coalesce (isim,ssn,adres) from insanlar; --Ali Can
+                                                    --Veli Cem
+                                                    --Mine Bulut
+                                                    --456789012
+                                                    --567890123
+                                                    --Sakarya
+                                                    --999111222
+  
+  --ORN TABLODAKI BUTUN NUL VERILERI GUZEL BIR CUMLECIKLE DEGISTIRIN     
+  
+  update insanlar
+  set isim=coalesce (isim,'henuz isim girilmedi'),
+       adres=coalesce (adres,'henuz adres girilmedi'),
+       ssn=coalesce (ssn,'No SSN');
+       
+       select* from insanlar;
+       
+ /* --================================ ORDER BY  ===================================
+   --ORDER BY cümleci?i bir SORGU deyimi içerisinde belli bir SUTUN’a göre
+   --SIRALAMA yapmak için kullan?l?r.
+   --Syntax
+   -------
+    --  ORDER BY sutun_adi ASC   -- ARTAN
+      --ORDER BY sutun_adi DESC  -- AZALAN
+=========================================*/  
+
+CREATE TABLE kisiler
+    (
+        ssn CHAR(9) PRIMARY KEY,
+        isim VARCHAR2(50),
+        soyisim VARCHAR2(50),
+        maas NUMBER,
+        adres VARCHAR2(50)
+    );
+    INSERT INTO kisiler VALUES(123456789, 'Ali','Can', 3000,'Istanbul');
+    INSERT INTO kisiler VALUES(234567890, 'Veli','Cem', 2890,'Ankara');
+    INSERT INTO kisiler VALUES(345678901, 'Mine','Bulut',4200,'Ankara');
+    INSERT INTO kisiler VALUES(256789012, 'Mahmut','Bulut',3150,'Istanbul');
+    INSERT INTO kisiler VALUES (344678901, 'Mine','Yasa', 5000,'Ankara');
+    INSERT INTO kisiler VALUES (345458901, 'Veli','Yilmaz',7000,'Istanbul');
+    SELECT * FROM kisiler;
+/* ----------------------------------------------------------------------------
+  ORNEK1: kisiler tablosunu adres'e göre s?ralayarak sorgulay?n?z.
+ -----------------------------------------------------------------------------*/
+ 
+ select * from kisiler
+ order by adres;
+ 
+ 
+ /* ----------------------------------------------------------------------------
+  ORNEK1: kisiler tablosunu maas'a göre azalan s?ralayarak sorgulay?n?z.
+ -----------------------------------------------------------------------------*/
+ select * from kisiler 
+ order by maas desc;
+ 
+ --ORNEK4: ismi Mine olanlar?, SSN'e göre AZALAN(DESC) s?rada sorgulay?n?z.
+   select * from kisiler
+   where isim='Mine'
+   order by ssn desc;
+   
+   --ORNEK5: soyismi 'i Bulut olanlar? isim s?ral? olarak sorgulay?n?z.
+-----------------------------------------------------------------------------*
+     select * from kisiler
+     where soyisim='Bulut'
+     order by 2;
+ 
+/*====================== FETCH NEXT, OFFSET (12C VE ÜSTÜ oracle larda çal???r, daha altsan?z çal??maz) ======================
+   FETCH cümleci?i ile listelenecek kay?tlar? s?n?rland?rabiliriz. ?stersek
+   sat?r say?s?na göre istersek de toplam sat?r say?s?n?n belli bir yüzdesine
+   göre s?n?rland?rma koymak mümkündür. (?u kadar sat?r? getir)
+   Syntax
+   ---------
+   FETCH NEXT satir_sayisi ROWS ONLY;
+   FETCH NEXT satir_yuzdesi PERCENT ROWS ONLY;
+   OFFSET Cümleci?i ile de listenecek olan sat?rlardan s?ras?yla istedi?imiz
+   kadar?n? atlayabiliriz.
+   Syntax
+   ----------
+   OFFSET sat?r_sayisi ROWS;
+==============================================================================*/
+/* ----------------------------------------------------------------------------
+  ORNEK1: MAA?'? en yüksek 3 ki?inin bilgilerini listeleyen sorguyu yaz?n?z.*/  
+  
+  
+  
+  select * from kisiler
+  order by maas desc
+  fetch next 3 rows only;
+  
+  SELECT * FROM (SELECT * FROM kisiler
+    ORDER BY maas DESC)--(1) ki?ilerde maasa göre ters s?rala
+    WHERE ROWNUM < 4;--1.,2., ve 3. satiri getir (bu yeni surumlerde calisir)
+    
+    --ORNEK2: MAA?'? en DÜ?ÜK 2 ki?inin bilgilerini listeleyen sorguyu yaz?n?z.
+    
+    /*select * from kisiler
+    order by maas
+    fetch next 2 rows only;*/
+    
+    SELECT * FROM (SELECT * FROM kisiler
+    ORDER BY maas DESC)--(1) ki?ilerde maasa göre ters s?rala
+    WHERE ROWNUM < 3;
+    
+    
+   select * from kisiler
+  order by maas desc
+  offset 3 rows
+  fetch next 3 rows only;
+    
+    
+    
+   /* ORNEK3: MAA?'a göre s?ralamada 4. 5. ve 6. ki?ilerin bilgilerini listeleyen
+  sorguyu yaz?n?z.*/
+  
+  SELECT * FROM
+   (SELECT * FROM
+   (SELECT * FROM   kisiler ORDER BY maas DESC)WHERE ROWNUM <=6) WHERE  ROWNUM <=3;
+    
+    
+       
+       
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          

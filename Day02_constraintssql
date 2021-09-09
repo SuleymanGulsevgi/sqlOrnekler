@@ -1,0 +1,128 @@
+--ORNEK1-NOT NULL
+--ogrenciler tablosu olusturalim ve id feild'ini bos birakilamaz yapalim
+
+create table ogrenciler(
+
+id char(4)not null,
+isim varchar(50),
+not_ort number(4,2),--98,34
+kayit_tarihi date 
+);
+
+insert into ogrenciler values('1234','Ali',75.25,'07/Sep/2021' );
+insert into ogrenciler values('1234','veli', null,null);
+insert into ogrenciler (id,isim) values ('3456','fatma');
+insert into ogrenciler values(null,'Ali',75.25,'07/Sep/2021' );--ORA-01400: cannot insert NULL into 
+                                                               --("HR"."OGRENCILER"."ID")
+
+select * from ogrenciler;
+
+--ORNEK2 UNIQUE
+--tedarikciler olusturalim id unique olsun
+
+create table tedarikciler(
+
+id char(4) unique,
+isim varchar(50),
+adres varchar(100),
+tarih date
+);
+
+insert into tedarikciler values('1234','mehmet','perilikaya antep','07/Sep/2021');
+insert into tedarikciler values('1234','ali','akkent antep','07/May/2021');--ORA-00001: unique constraint 
+                                                                           --(HR.SYS_C006999) violated
+                                                                           
+insert into tedarikciler values('null','vali','duztepe antep','07/May/2021'); 
+insert into tedarikciler values(null,'can','karatas izmir','07/Jun/2021');
+
+drop table tedarikciler;
+--unique constraint tekrara izin vermez. Ancak istedigimiz kadar null girebilirsiniz
+
+select * from tedarikciler;
+
+
+--ORNEK3 PRIMARY KEY
+
+ CREATE TABLE calisanlar
+    (
+        id CHAR(5) PRIMARY KEY,
+        isim VARCHAR2(50) UNIQUE,
+        maas NUMBER(5) NOT NULL,
+        ise_baslama DATE
+    );
+    
+    INSERT INTO calisanlar VALUES('10001', 'Ahmet Aslan',7000, '13-Apr-2018');
+    INSERT INTO calisanlar VALUES( '10001', 'Mehmet Y?lmaz' ,12000, '14-Apr-18');--unique constraint 
+                                                                                 --(HR.SYS_C007007) violated
+    INSERT INTO calisanlar VALUES('10003', '', 5000, '14-Apr-18');
+    INSERT INTO calisanlar VALUES('10004', 'Veli Han', 5000, '14-Apr-18');
+    INSERT INTO calisanlar VALUES('10005', 'Mustafa Ali', 5000, '14-Apr-18'); 
+    INSERT INTO calisanlar VALUES('10006', 'Canan Yas', NULL, '12-Apr-19');--Null olamaz
+    
+    SELECT * FROM calisanlar;
+    DROP TABLE calisanlar;
+    
+ --Primary key alternatif yontem--   
+ --bu yontemde kisitlamaya istedigimiz ismi atayabiliriz
+ 
+ ---------------------------------------------------------------
+-- KISITLAMALAR (ORNEK2 - PRIMARY KEY ALTERNAT?F YÖNTEM)
+----------------------------------------------------------------
+-- Bu yöntemde K?s?tlamaya istedi?imiz ismi atayabiliriz 
+-- ve DISABLE komutuyla istedi?imizde pasif hale getirebiliriz. 
+    
+    CREATE TABLE calisanlar1
+    (
+        id CHAR(5), 
+        isim VARCHAR2(50) UNIQUE,
+        maas NUMBER(5) NOT NULL,
+        ise_baslama DATE,
+        CONSTRAINT id_pk PRIMARY KEY(id) --DISABLE
+    );
+    
+    INSERT INTO calisanlar1 VALUES('10001', 'Ahmet Aslan',7000, '13-Apr-2018');
+    INSERT INTO calisanlar1 VALUES( '10002', 'Mehmet Y?lmaz' ,12000, '14-Apr-18');
+    INSERT INTO calisanlar1 VALUES('10003', 'CAN', 5000, '14-Apr-18');
+    
+    select * from calisanlar1;
+    
+    --bir tbaloya data eklerken constraint'lere dikkat edilmelidir
+    
+    --ORNEK 4 FOREIGN KEY--
+    
+   CREATE TABLE adresler
+    (
+        adres_id CHAR(5),     -- REFERENCES calisanlar(id),
+        sokak VARCHAR2(50),
+        cadde VARCHAR2(30),
+        sehir VARCHAR2(15),
+        CONSTRAINT id_fk FOREIGN KEY(adres_id) REFERENCES calisanlar(id) 
+    );
+    
+    INSERT INTO adresler VALUES('10001','Mutlu Sok', '40.Cad.','IST');
+    INSERT INTO adresler VALUES('10001','Can Sok', '50.Cad.','Ankara');
+    INSERT INTO adresler VALUES('10002','A?a Sok', '30.Cad.','Antep');
+     
+    INSERT INTO adresler VALUES('','A?a Sok', '30.Cad.','Antep');
+    INSERT INTO adresler VALUES('','A?a Sok', '30.Cad.','Antep');---- FK'ye null de?eri ATANABILIR.
+    
+    INSERT INTO adresler VALUES('10004','Gel Sok', '60.Cad.','Van');---- Parent tabloda olmayan bir id
+                                                                    ---ile ekleme yap?lamaz.
+    
+    SELECT * FROM adresler;--CHILD
+    SELECT * FROM calisanlar1;--PARENT
+
+    drop table calisanlar1;--==>--chilld silinmeden parent silinmez
+    drop table adresler;
+
+    --ogrenciler5 tablosunu olusturun ve id isim hanelerinii birlesimini primary key yapin
+    
+    
+
+
+
+
+
+
+
+

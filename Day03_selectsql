@@ -1,0 +1,80 @@
+--------------------------SELECT- WHERE-------------------------------------
+CREATE TABLE ogrenciler2(
+        id NUMBER(9),
+        isim VARCHAR2(50),
+        adres VARCHAR2(100),
+        sinav_notu NUMBER(3)
+    );
+    
+    INSERT INTO ogrenciler2 VALUES(123, 'Ali Can', 'Ankara',75);
+    INSERT INTO ogrenciler2 VALUES(124, 'Merve Gul', 'Ankara',85);
+    INSERT INTO ogrenciler2 VALUES(125, 'Kemal Yasa', 'Istanbul',85);
+    SELECT * FROM ogrenciler2;
+    --0RNEK1 SINAV NOTU 80 DEN BUYUK OLAN TUM OGRENCILERIN BILGILERINI LISTELE
+     SELECT * FROM ogrenciler2
+    WHERE sinav_notu>80;
+    
+    -----ORNEK2 ADRESI ANKARA OLAN OGRENCILERIN ISIM VE ADRESLERINI LISTELE
+    select isim,adres from ogrenciler2
+    where adres='Ankara';
+    
+    --ORNEK 3 ID'SI 124 OLAN TUM BILGILERINI SILINIZ--
+    
+    delete from ogrenciler2
+    where id=124;
+    
+    --SELECT BETWEEN--
+    CREATE TABLE personel
+    (   
+        id CHAR(5),
+        isim VARCHAR2(50),
+        maas NUMBER(5)
+    );
+
+    INSERT INTO personel VALUES('10001', 'Ahmet Aslan', 7000);
+    INSERT INTO personel VALUES( '10002', 'Mehmet Yilmaz' ,12000);
+    INSERT INTO personel VALUES('10003', 'Meryem ', 7215);
+    INSERT INTO personel VALUES('10004', 'Veli Han', 5000);
+    INSERT INTO personel VALUES('10005', 'Mustafa Ali', 5500);
+    INSERT INTO personel VALUES('10005', 'Ayse Can', 4000);
+
+    SELECT * FROM personel;
+    
+    -- NOT:BETWEEN iki mant?ksal ifade ile tan?mlayabilece?imiz durumlar? 
+    -- tek komutla yazabilme imkân? verir. Yazd???m?z 2 s?n?r da aral??a dahildir.
+    
+    --ORNEK4 ID SI 10002 ILE 10005 ARASINDA OLAN PERSONELIN BILGILERINI LISTELE
+    --1.yontem
+    select * from personel
+    where id between '10002' and '10005'; -- between de ilk ve son deger dahil
+    
+    --2. yontem:
+    select * from personel
+    where id>='10002' and id>='10005';
+    
+    --ORNEK5: ISMI MEHMET YILMAZ ILE VELI HAN ARASINDAKI PERSONEL BILGILERINI LISTELE
+    
+    select * from personel
+    where isim between 'Mehmet Yilmaz' and 'Veli Han' ;
+    
+    --ORNEK6: ID'SI 10002 ILE 10004 ARASINDA OLMAYAN PERSONELI MAASINI LISTELE
+    select id,maas from personel
+    where id not between '10002' and '10004';
+    
+    -- ======================= SELECT - IN ======================================
+    --IN birden fazla mant?ksal ifade ile tan?mlayabilece?imiz durumlar? 
+    --tek komutla yazabilme imkân? verir
+    --SYNTAX:
+    -------
+    --SELECT sutun1,sutun2, ...
+    --FROM tablo_ad?
+    --WHERE sutun_ad? IN (deger1, deger2, ...);
+---------------------------------------------------------------------
+    --0RNEK 7 MAASI 4000,5000,7000 OLAN PERSONELIN BILGILERINI LISTELE
+    
+    select * from personel
+    where maas in(4000,5000,7000);
+    
+    
+    
+    
